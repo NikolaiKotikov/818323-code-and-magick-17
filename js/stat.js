@@ -9,10 +9,9 @@ var CLOUD_X = 100;
 var CLOUD_Y = 10;
 var GAP = 10;
 var TEXT_GAP = 20;
+var SUCCESS_MESSAGES = ['Ура вы победили!', 'Список результатов:'];
 
 var playerNameY = CLOUD_Y + CLOUD_HEIGHT - TEXT_GAP;
-
-var successMessages = ['Ура вы победили!', 'Список результатов:'];
 
 var renderCloud = function (ctx, x, y, color) {
   ctx.fillStyle = color;
@@ -40,10 +39,36 @@ var getMaxElement = function (arr) {
   return maxElement;
 };
 
+/*  renderStatsText - функция для вывода данных имени и времени игрока в
+    текстовом виде. Параметры:
+    timeText - время игрока;
+    timeY - координата 'Y' сообщения о времени;
+    nameText - имя игрока;
+    nameY - координата 'Y' сообщения об имени;
+    number - порядковый номер игрока (отсчёт ведётся от нуля)*/
+
+var renderStatsText = function (ctx, timeText, timeY, nameText, nameY, number) {
+  ctx.fillText(Math.round(timeText), CLOUD_X + TEXT_GAP * 2 + (COLUMN_WIDTH + COLUMN_GAP) * number, timeY);
+  ctx.fillText(nameText, CLOUD_X + TEXT_GAP * 2 + (COLUMN_WIDTH + COLUMN_GAP) * number, nameY);
+};
+
+/*  renderStatsColumn - функция для отрисовки колонны. Параметры:
+    nameY - координата 'Y' сообщения об имени;
+    height - высота колонны;
+    number - порядковый номер колонны (соответствует номеру игрока, отсчёт ведётся от нуля)*/
+
+var renderStatsColumn = function (ctx, nameY, height, number) {
+  ctx.fillRect(CLOUD_X + TEXT_GAP * 2 + (COLUMN_WIDTH + COLUMN_GAP) * number, nameY - TEXT_GAP - height, COLUMN_WIDTH, height);
+};
+
+var getRandomNumber = function (minNumber, maxNumber) {
+  return Math.floor(Math.random() * (maxNumber - minNumber) + minNumber);
+};
+
 window.renderStatistics = function (ctx, names, times) {
   renderCloud(ctx, CLOUD_X + GAP, CLOUD_Y + GAP, 'rgba(0, 0, 0, 0.7)');
   renderCloud(ctx, CLOUD_X, CLOUD_Y, '#fff');
-  printText(ctx, successMessages);
+  printText(ctx, SUCCESS_MESSAGES);
   var maxTime = getMaxElement(times);
 
   for (var i = 0; i < names.length; i++) {
@@ -53,14 +78,14 @@ window.renderStatistics = function (ctx, names, times) {
     var columnHeight = Math.round(COLUMN_HEIGHT * times[i] / maxTime);
     var playerTimeY = playerNameY - TEXT_GAP - GAP - columnHeight;
 
-    ctx.fillText(Math.round(times[i]), CLOUD_X + TEXT_GAP * 2 + (COLUMN_WIDTH + COLUMN_GAP) * i, playerTimeY);
-    ctx.fillText(names[i], CLOUD_X + TEXT_GAP * 2 + (COLUMN_WIDTH + COLUMN_GAP) * i, playerNameY);
+    renderStatsText(ctx, times[i], playerTimeY, names[i], playerNameY, i);
 
-    ctx.fillStyle = 'rgb(0, 0,' + Math.floor(Math.random() * 255) + ')';
+    ctx.fillStyle = 'rgb(0, 0,' + getRandomNumber(100, 255) + ')';
+
     if (names[i] === 'Вы') {
       ctx.fillStyle = 'rgb(255, 0, 0)';
     }
 
-    ctx.fillRect(CLOUD_X + TEXT_GAP * 2 + (COLUMN_WIDTH + COLUMN_GAP) * i, playerNameY - TEXT_GAP - columnHeight, COLUMN_WIDTH, columnHeight);
+    renderStatsColumn(ctx, playerNameY, columnHeight, i);
   }
 };
