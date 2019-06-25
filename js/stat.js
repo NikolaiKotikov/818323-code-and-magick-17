@@ -73,8 +73,15 @@ var renderStatsColumn = function (ctx, nameY, height, number) {
   ctx.fillRect(getX(number), nameY - TEXT_GAP - height, COLUMN_WIDTH, height);
 };
 
+/**
+ * Функция, которая возвращает случайное число в заданном диапазоне,
+ * ВКЛЮЧАЯ нижнее и верхнее значения.
+ * @param {Number} minNumber - нижняя граница диапазона;
+ * @param {number} maxNumber - верхняя граница диапазона;
+ * @return {number} - возвращает случайное число;
+ */
 var getRandomNumber = function (minNumber, maxNumber) {
-  return Math.floor(Math.random() * (maxNumber - minNumber) + minNumber);
+  return Math.floor(Math.random() * (maxNumber + 1 - minNumber) + minNumber);
 };
 
 window.renderStatistics = function (ctx, names, times) {
