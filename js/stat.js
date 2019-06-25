@@ -39,30 +39,49 @@ var getMaxElement = function (arr) {
   return maxElement;
 };
 
-/*  renderStatsText - функция для вывода данных имени и времени игрока в
-    текстовом виде. Параметры:
-    timeText - время игрока;
-    timeY - координата 'Y' сообщения о времени;
-    nameText - имя игрока;
-    nameY - координата 'Y' сообщения об имени;
-    number - порядковый номер игрока (отсчёт ведётся от нуля)*/
+/**
+ * Вспомогательная функция для рассчета координаты X во избежание дублирования кода
+ * @param {Number} number - порядковый номер игрока (отсчёт ведётся от нуля);
+ * @return {Number}
+ */
+var getX = function (number) {
+  return CLOUD_X + TEXT_GAP * 2 + (COLUMN_WIDTH + COLUMN_GAP) * number;
+};
 
+/**
+ * Функция для вывода данных имени и времени игрока в текстовом виде.
+ * @param {*} ctx
+ * @param {Number} timeText - время игрока;
+ * @param {Number} timeY - координата 'Y' сообщения о времени;
+ * @param {String} nameText - имя игрока;
+ * @param {Number} nameY - координата 'Y' сообщения об имени;
+ * @param {Number} number - порядковый номер игрока (отсчёт ведётся от нуля);
+ */
 var renderStatsText = function (ctx, timeText, timeY, nameText, nameY, number) {
-  ctx.fillText(Math.round(timeText), CLOUD_X + TEXT_GAP * 2 + (COLUMN_WIDTH + COLUMN_GAP) * number, timeY);
-  ctx.fillText(nameText, CLOUD_X + TEXT_GAP * 2 + (COLUMN_WIDTH + COLUMN_GAP) * number, nameY);
+  ctx.fillText(Math.round(timeText), getX(number), timeY);
+  ctx.fillText(nameText, getX(number), nameY);
 };
 
-/*  renderStatsColumn - функция для отрисовки колонны. Параметры:
-    nameY - координата 'Y' сообщения об имени;
-    height - высота колонны;
-    number - порядковый номер колонны (соответствует номеру игрока, отсчёт ведётся от нуля)*/
-
+/**
+ *  Функция для отрисовки колонны.
+ * @param {*} ctx
+ * @param {Number} nameY - координата 'Y' сообщения об имени;
+ * @param {Number} height  - высота колонны;
+ * @param {Number} number  - порядковый номер колонны (соответствует номеру игрока, отсчёт ведётся от нуля);
+ */
 var renderStatsColumn = function (ctx, nameY, height, number) {
-  ctx.fillRect(CLOUD_X + TEXT_GAP * 2 + (COLUMN_WIDTH + COLUMN_GAP) * number, nameY - TEXT_GAP - height, COLUMN_WIDTH, height);
+  ctx.fillRect(getX(number), nameY - TEXT_GAP - height, COLUMN_WIDTH, height);
 };
 
+/**
+ * Функция, которая возвращает случайное число в заданном диапазоне,
+ * ВКЛЮЧАЯ нижнее и верхнее значения.
+ * @param {Number} minNumber - нижняя граница диапазона;
+ * @param {number} maxNumber - верхняя граница диапазона;
+ * @return {number} - возвращает случайное число;
+ */
 var getRandomNumber = function (minNumber, maxNumber) {
-  return Math.floor(Math.random() * (maxNumber - minNumber) + minNumber);
+  return Math.floor(Math.random() * (maxNumber + 1 - minNumber) + minNumber);
 };
 
 window.renderStatistics = function (ctx, names, times) {
@@ -80,11 +99,7 @@ window.renderStatistics = function (ctx, names, times) {
 
     renderStatsText(ctx, times[i], playerTimeY, names[i], playerNameY, i);
 
-    ctx.fillStyle = 'rgb(0, 0,' + getRandomNumber(100, 255) + ')';
-
-    if (names[i] === 'Вы') {
-      ctx.fillStyle = 'rgb(255, 0, 0)';
-    }
+    ctx.fillStyle = names[i] === 'Вы' ? 'rgb(255, 0, 0)' : 'rgb(0, 0,' + getRandomNumber(100, 255) + ')';
 
     renderStatsColumn(ctx, playerNameY, columnHeight, i);
   }
