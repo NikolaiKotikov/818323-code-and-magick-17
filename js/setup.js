@@ -4,10 +4,20 @@ var WIZARD_NAMES = ['Иван', 'Хуан Себастьян', 'Мария', 'К
 var WIZARD_SURNAMES = ['да Марья', 'Верон', 'Мирабелла', 'Вальц', 'Онопко', 'Топольницкая', 'Нионго', 'Ирвинг'];
 var WIZARD_COAT_COLORS = ['rgb(101, 137, 164)', 'rgb(241, 43, 107)', 'rgb(146, 100, 161)', 'rgb(56, 159, 117)', 'rgb(215, 210, 55)', 'rgb(0, 0, 0)'];
 var WIZARD_EYES_COLORS = ['black', 'red', 'blue', 'yellow', 'green'];
+var FIREBALL_COLORS = ['#ee4830', '#30a8ee', '#5ce6c0', '#e848d5', '#e6e848'];
+var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
 
 var userDialog = document.querySelector('.setup');
-userDialog.classList.remove('hidden');
-
+var openUserDialog = document.querySelector('.setup-open');
+var closeUserDialog = userDialog.querySelector('.setup-close');
+var setupPlayer = document.querySelector('.setup-player');
+var wizardCoat = setupPlayer.querySelector('.wizard-coat');
+var wizardEyes = setupPlayer.querySelector('.wizard-eyes');
+var setupFireballWrap = setupPlayer.querySelector('.setup-fireball-wrap');
+var fireballInput = setupPlayer.querySelector('input[name="fireball-color"]');
+var wizardCoatInput = setupPlayer.querySelector('input[name="coat-color"]');
+var wizardEyesInput = setupPlayer.querySelector('input[name="eyes-color"]');
 var similarListElement = userDialog.querySelector('.setup-similar-list');
 var similarWizardTemplate = document.querySelector('#similar-wizard-template').content.querySelector('.setup-similar-item');
 
@@ -24,11 +34,11 @@ var getRandomNumber = function (minNumber, maxNumber) {
 
 /**
  * Функция для получения случайного элемента массива;
- * @param {wizardsay} wizardsay - принимает в качестве аргумента массив;
+ * @param {Array} arr - принимает в качестве аргумента массив;
  * @return {Number} - возвращает случайный элемент;
  */
-var getRandomElement = function (wizardsay) {
-  return wizardsay[getRandomNumber(0, wizardsay.length - 1)];
+var getRandomElement = function (arr) {
+  return arr[getRandomNumber(0, arr.length - 1)];
 };
 
 var getWizardFullName = function (names, surnames) {
@@ -38,7 +48,7 @@ var getWizardFullName = function (names, surnames) {
 /**
  * Функция генерирует массив с заданным количеством волшебников;
  * @param {Number} amount - количество волшебников;
- * @return {wizardsay} возвращает сгенерированный массив;
+ * @return {Array} возвращает сгенерированный массив;
  */
 var generateWizards = function (amount) {
   var wizards = [];
@@ -87,5 +97,65 @@ var renderWizard = function (wizards) {
   similarListElement.appendChild(fragment);
 };
 
+var onPopupEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closePopup();
+  }
+};
+
+var closePopup = function () {
+  userDialog.classList.add('hidden');
+  document.removeEventListener('keydown', onPopupEscPress);
+};
+
+var openPopup = function () {
+  userDialog.classList.remove('hidden');
+
+  document.addEventListener('keydown', onPopupEscPress);
+
+  closeUserDialog.addEventListener('keydown', function (evt) {
+    if (evt.keyCode === ENTER_KEYCODE) {
+      closePopup();
+    }
+  });
+};
+
+var changeElementColor = function (colors, element, elementInput) {
+  var color = getRandomElement(colors);
+
+  if (elementInput.name === 'fireball-color') {
+    element.style.background = color;
+  } else {
+    element.style.fill = color;
+  }
+  elementInput.value = color;
+};
+
+wizardCoat.addEventListener('click', function () {
+  changeElementColor(WIZARD_COAT_COLORS, wizardCoat, wizardCoatInput);
+});
+
+wizardEyes.addEventListener('click', function () {
+  changeElementColor(WIZARD_EYES_COLORS, wizardEyes, wizardEyesInput);
+});
+
+setupFireballWrap.addEventListener('click', function () {
+  changeElementColor(FIREBALL_COLORS, setupFireballWrap, fireballInput);
+});
+
 renderWizard(generateWizards(4));
 userDialog.querySelector('.setup-similar').classList.remove('hidden');
+
+openUserDialog.addEventListener('click', function () {
+  openPopup();
+});
+
+openUserDialog.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    openPopup();
+  }
+});
+
+closeUserDialog.addEventListener('click', function () {
+  closePopup();
+});
