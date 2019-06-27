@@ -103,9 +103,16 @@ var onPopupEscPress = function (evt) {
   }
 };
 
+var onCloseUserDialogEnterPress = function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    closePopup();
+  }
+};
+
 var closePopup = function () {
   userDialog.classList.add('hidden');
   document.removeEventListener('keydown', onPopupEscPress);
+  document.removeEventListener('keydown', onCloseUserDialogEnterPress);
 };
 
 var openPopup = function () {
@@ -113,11 +120,7 @@ var openPopup = function () {
 
   document.addEventListener('keydown', onPopupEscPress);
 
-  closeUserDialog.addEventListener('keydown', function (evt) {
-    if (evt.keyCode === ENTER_KEYCODE) {
-      closePopup();
-    }
-  });
+  closeUserDialog.addEventListener('keydown', onCloseUserDialogEnterPress);
 };
 
 var changeElementColor = function (colors, element, elementInput) {
