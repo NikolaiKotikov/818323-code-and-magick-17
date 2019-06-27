@@ -73,17 +73,6 @@ var renderStatsColumn = function (ctx, nameY, height, number) {
   ctx.fillRect(getX(number), nameY - TEXT_GAP - height, COLUMN_WIDTH, height);
 };
 
-/**
- * Функция, которая возвращает случайное число в заданном диапазоне,
- * ВКЛЮЧАЯ нижнее и верхнее значения.
- * @param {Number} minNumber - нижняя граница диапазона;
- * @param {number} maxNumber - верхняя граница диапазона;
- * @return {number} - возвращает случайное число;
- */
-var getRandomNumber = function (minNumber, maxNumber) {
-  return Math.floor(Math.random() * (maxNumber + 1 - minNumber) + minNumber);
-};
-
 window.renderStatistics = function (ctx, names, times) {
   renderCloud(ctx, CLOUD_X + GAP, CLOUD_Y + GAP, 'rgba(0, 0, 0, 0.7)');
   renderCloud(ctx, CLOUD_X, CLOUD_Y, '#fff');
@@ -99,7 +88,7 @@ window.renderStatistics = function (ctx, names, times) {
 
     renderStatsText(ctx, times[i], playerTimeY, names[i], playerNameY, i);
 
-    ctx.fillStyle = names[i] === 'Вы' ? 'rgb(255, 0, 0)' : 'rgb(0, 0,' + getRandomNumber(100, 255) + ')';
+    ctx.fillStyle = names[i] === 'Вы' ? 'rgb(255, 0, 0)' : 'rgb(0, 0,' + window.getRandomNumber(100, 255) + ')';
 
     renderStatsColumn(ctx, playerNameY, columnHeight, i);
   }

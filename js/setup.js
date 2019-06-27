@@ -22,23 +22,12 @@ var similarListElement = userDialog.querySelector('.setup-similar-list');
 var similarWizardTemplate = document.querySelector('#similar-wizard-template').content.querySelector('.setup-similar-item');
 
 /**
- * Функция, которая возвращает случайное число в заданном диапазоне,
- * ВКЛЮЧАЯ нижнее и верхнее значения.
- * @param {Number} minNumber - нижняя граница диапазона;
- * @param {number} maxNumber - верхняя граница диапазона;
- * @return {number} - возвращает случайное число;
- */
-var getRandomNumber = function (minNumber, maxNumber) {
-  return Math.floor(Math.random() * (maxNumber + 1 - minNumber) + minNumber);
-};
-
-/**
  * Функция для получения случайного элемента массива;
  * @param {Array} arr - принимает в качестве аргумента массив;
  * @return {Number} - возвращает случайный элемент;
  */
 var getRandomElement = function (arr) {
-  return arr[getRandomNumber(0, arr.length - 1)];
+  return arr[window.getRandomNumber(0, arr.length - 1)];
 };
 
 var getWizardFullName = function (names, surnames) {
