@@ -110,6 +110,9 @@ var openPopup = function () {
   document.addEventListener('keydown', onPopupEscPress);
 
   closeUserDialog.addEventListener('keydown', onCloseUserDialogEnterPress);
+
+  userDialog.style.left = '50%';
+  userDialog.style.top = '80px';
 };
 
 var changeElementColor = function (colors, element, elementInput) {
