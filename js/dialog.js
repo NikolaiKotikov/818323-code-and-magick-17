@@ -8,7 +8,7 @@ var draggedItem = null;
 upload.addEventListener('mousedown', function (evt) {
   evt.preventDefault();
 
-  var dragged = false;
+  var dragged = false; // флаг для проверки, было ли перетаскивание окна
 
   var startCoords = {
     x: evt.clientX,
@@ -24,7 +24,7 @@ upload.addEventListener('mousedown', function (evt) {
     };
 
     if ((shift.x !== 0) || (shift.y !== 0)) {
-      dragged = true;
+      dragged = true; // проверка на перетаскивание окна
     }
 
     startCoords = {
@@ -38,6 +38,10 @@ upload.addEventListener('mousedown', function (evt) {
 
   var onMouseUp = function (upEvt) {
 
+    // если было перетаскивание, создаем обработчик клика для блока "upload",
+    // который содержит в себе поле input с атрибутом type="file";
+    // в обработчике убираем действие по умолчанию, для того, чтобы
+    // при отпускании кнопки мыши не открывался диалог выбора файла
     if (dragged) {
       var onMouseClickPreventDefault = function (clickEvt) {
         clickEvt.preventDefault();
