@@ -84,7 +84,7 @@
 
   var onFormSubmit = function (evt) {
     evt.preventDefault();
-    window.upload(new FormData(form), closePopup(), onErrorLoad);
+    window.save(new FormData(form), closePopup(), onErrorLoad);
   };
 
   var closePopup = function () {
