@@ -1,8 +1,6 @@
 'use strict';
 
 (function () {
-  var WIZARD_NAMES = ['Иван', 'Хуан Себастьян', 'Мария', 'Кристоф', 'Виктор', 'Юлия', 'Люпита', 'Вашингтон'];
-  var WIZARD_SURNAMES = ['да Марья', 'Верон', 'Мирабелла', 'Вальц', 'Онопко', 'Топольницкая', 'Нионго', 'Ирвинг'];
   var WIZARD_COAT_COLORS = ['rgb(101, 137, 164)', 'rgb(241, 43, 107)', 'rgb(146, 100, 161)', 'rgb(56, 159, 117)', 'rgb(215, 210, 55)', 'rgb(0, 0, 0)'];
   var WIZARD_EYES_COLORS = ['black', 'red', 'blue', 'yellow', 'green'];
   var FIREBALL_COLORS = ['#ee4830', '#30a8ee', '#5ce6c0', '#e848d5', '#e6e848'];
@@ -10,6 +8,7 @@
   var ENTER_KEYCODE = 13;
 
   var userDialog = document.querySelector('.setup');
+  var form = userDialog.querySelector('.setup-wizard-form');
   var openUserDialog = document.querySelector('.setup-open');
   var closeUserDialog = userDialog.querySelector('.setup-close');
   var setupPlayer = document.querySelector('.setup-player');
@@ -31,33 +30,6 @@
     return arr[window.getRandomNumber(0, arr.length - 1)];
   };
 
-  var getWizardFullName = function (names, surnames) {
-    return getRandomElement(names) + ' ' + getRandomElement(surnames);
-  };
-
-  /**
-   * Функция генерирует массив с заданным количеством волшебников;
-   * @param {Number} amount - количество волшебников;
-   * @return {Array} возвращает сгенерированный массив;
-   */
-  var generateWizards = function (amount) {
-    var wizards = [];
-
-    for (var i = 0; i < amount; i++) {
-      var wizardDescription = {};
-      var wizardFullName = getWizardFullName(WIZARD_NAMES, WIZARD_SURNAMES);
-      var wizardCoatColor = getRandomElement(WIZARD_COAT_COLORS);
-      var wizardEyesColor = getRandomElement(WIZARD_EYES_COLORS);
-
-      wizardDescription.name = wizardFullName;
-      wizardDescription.coatColor = wizardCoatColor;
-      wizardDescription.eyesColor = wizardEyesColor;
-      wizards.push(wizardDescription);
-    }
-
-    return wizards;
-  };
-
   /**
    * Функция клонирует элемент из шаблона и настраивает его в соответствии с переданными
    * в нее данными об этом элементе;
@@ -68,8 +40,8 @@
     var wizardElement = similarWizardTemplate.cloneNode(true);
 
     wizardElement.querySelector('.setup-similar-label').textContent = wizard.name;
-    wizardElement.querySelector('.wizard-coat').style.fill = wizard.coatColor;
-    wizardElement.querySelector('.wizard-eyes').style.fill = wizard.eyesColor;
+    wizardElement.querySelector('.wizard-coat').style.fill = wizard.colorCoat;
+    wizardElement.querySelector('.wizard-eyes').style.fill = wizard.colorEyes;
 
     return wizardElement;
   };
@@ -78,13 +50,24 @@
    * функция для заполнения блока DOM-элементами на основе массива JS-объектов
    * @param {array} wizards - принимает массив JS-объектов
    */
-  var renderWizard = function (wizards) {
+  var onSuccessLoad = function (wizards) {
     var fragment = document.createDocumentFragment();
 
-    for (var i = 0; i < wizards.length; i++) {
-      fragment.appendChild(createWizard(wizards[i]));
+    for (var i = 0; i < 4; i++) {
+      fragment.appendChild(createWizard(getRandomElement(wizards)));
     }
     similarListElement.appendChild(fragment);
+  };
+
+  var onErrorLoad = function (errorMessage) {
+    var node = document.createElement('div');
+    node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red;';
+    node.style.position = 'absolute';
+    node.style.left = 0;
+    node.style.right = 0;
+    node.style.fontSize = '30px';
+    node.textContent = errorMessage;
+    document.body.insertAdjacentElement('afterbegin', node);
   };
 
   var onPopupEscPress = function (evt) {
@@ -99,10 +82,16 @@
     }
   };
 
+  var onFormSubmit = function (evt) {
+    evt.preventDefault();
+    window.save(new FormData(form), closePopup(), onErrorLoad);
+  };
+
   var closePopup = function () {
     userDialog.classList.add('hidden');
     document.removeEventListener('keydown', onPopupEscPress);
     document.removeEventListener('keydown', onCloseUserDialogEnterPress);
+    form.removeEventListener('submit', onFormSubmit);
   };
 
   var openPopup = function () {
@@ -111,6 +100,8 @@
     document.addEventListener('keydown', onPopupEscPress);
 
     closeUserDialog.addEventListener('keydown', onCloseUserDialogEnterPress);
+
+    form.addEventListener('submit', onFormSubmit);
 
     userDialog.style.left = '50%';
     userDialog.style.top = '80px';
@@ -139,9 +130,6 @@
     changeElementColor(FIREBALL_COLORS, setupFireballWrap, fireballInput);
   });
 
-  renderWizard(generateWizards(4));
-  userDialog.querySelector('.setup-similar').classList.remove('hidden');
-
   openUserDialog.addEventListener('click', function () {
     openPopup();
   });
@@ -155,5 +143,7 @@
   closeUserDialog.addEventListener('click', function () {
     closePopup();
   });
-})();
 
+  window.backend.load(onSuccessLoad, onErrorLoad);
+  userDialog.querySelector('.setup-similar').classList.remove('hidden');
+})();
