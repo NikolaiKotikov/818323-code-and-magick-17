@@ -18,8 +18,6 @@
   var fireballInput = setupPlayer.querySelector('input[name="fireball-color"]');
   var wizardCoatInput = setupPlayer.querySelector('input[name="coat-color"]');
   var wizardEyesInput = setupPlayer.querySelector('input[name="eyes-color"]');
-  var similarListElement = userDialog.querySelector('.setup-similar-list');
-  var similarWizardTemplate = document.querySelector('#similar-wizard-template').content.querySelector('.setup-similar-item');
 
   /**
    * Функция для получения случайного элемента массива;
@@ -28,46 +26,6 @@
    */
   var getRandomElement = function (arr) {
     return arr[window.getRandomNumber(0, arr.length - 1)];
-  };
-
-  /**
-   * Функция клонирует элемент из шаблона и настраивает его в соответствии с переданными
-   * в нее данными об этом элементе;
-   * @param {Object} wizard - принимает объект с данными для настройки;
-   * @return {*} - возвращает ноду, готовую для добавления в DOM;
-   */
-  var createWizard = function (wizard) {
-    var wizardElement = similarWizardTemplate.cloneNode(true);
-
-    wizardElement.querySelector('.setup-similar-label').textContent = wizard.name;
-    wizardElement.querySelector('.wizard-coat').style.fill = wizard.colorCoat;
-    wizardElement.querySelector('.wizard-eyes').style.fill = wizard.colorEyes;
-
-    return wizardElement;
-  };
-
-  /**
-   * функция для заполнения блока DOM-элементами на основе массива JS-объектов
-   * @param {array} wizards - принимает массив JS-объектов
-   */
-  var onSuccessLoad = function (wizards) {
-    var fragment = document.createDocumentFragment();
-
-    for (var i = 0; i < 4; i++) {
-      fragment.appendChild(createWizard(getRandomElement(wizards)));
-    }
-    similarListElement.appendChild(fragment);
-  };
-
-  var onErrorLoad = function (errorMessage) {
-    var node = document.createElement('div');
-    node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red;';
-    node.style.position = 'absolute';
-    node.style.left = 0;
-    node.style.right = 0;
-    node.style.fontSize = '30px';
-    node.textContent = errorMessage;
-    document.body.insertAdjacentElement('afterbegin', node);
   };
 
   var onPopupEscPress = function (evt) {
@@ -84,7 +42,7 @@
 
   var onFormSubmit = function (evt) {
     evt.preventDefault();
-    window.save(new FormData(form), closePopup(), onErrorLoad);
+    window.save(new FormData(form), closePopup(), onErrorLoad());
   };
 
   var closePopup = function () {
@@ -116,14 +74,21 @@
       element.style.fill = color;
     }
     elementInput.value = color;
-  };
 
+  };
+  var coatColor;
   wizardCoat.addEventListener('click', function () {
     changeElementColor(WIZARD_COAT_COLORS, wizardCoat, wizardCoatInput);
-  });
+    coatColor = wizardCoat.style.fill;
 
+    window.debounce(updateWizards, 500);
+  });
+  var eyesColor;
   wizardEyes.addEventListener('click', function () {
     changeElementColor(WIZARD_EYES_COLORS, wizardEyes, wizardEyesInput);
+    eyesColor = wizardEyes.style.fill;
+
+    window.debounce(updateWizards, 500);
   });
 
   setupFireballWrap.addEventListener('click', function () {
@@ -144,6 +109,58 @@
     closePopup();
   });
 
+  var wizards = [];
+
+  var getRank = function (wizard) {
+    var rank = 0;
+
+    if (wizard.colorCoat === coatColor) {
+      rank += 2;
+    }
+    if (wizard.colorEyes === eyesColor) {
+      rank += 1;
+    }
+
+    return rank;
+  };
+
+  var namesComparator = function (left, right) {
+    if (left > right) {
+      return 1;
+    } else if (left < right) {
+      return -1;
+    } else {
+      return 0;
+    }
+  };
+
+  var updateWizards = function () {
+    window.render(wizards.sort(function (left, right) {
+      var rankDiff = getRank(right) - getRank(left);
+      if (rankDiff === 0) {
+        rankDiff = namesComparator(left.name, right.name);
+      }
+      return rankDiff;
+    }));
+  };
+
+  var onSuccessLoad = function (data) {
+    wizards = data;
+    updateWizards();
+  };
+
+  var onErrorLoad = function (errorMessage) {
+    var node = document.createElement('div');
+    node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red;';
+    node.style.position = 'absolute';
+    node.style.left = 0;
+    node.style.right = 0;
+    node.style.fontSize = '30px';
+
+    node.textContent = errorMessage;
+    document.body.insertAdjacentElement('afterbegin', node);
+  };
+
   window.backend.load(onSuccessLoad, onErrorLoad);
-  userDialog.querySelector('.setup-similar').classList.remove('hidden');
+
 })();
