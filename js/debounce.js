@@ -2,12 +2,17 @@
 
 (function () {
 
-  window.debounce = function (cb, ms) {
-    if (window.lastTimeout) {
-      clearTimeout(window.lastTimeout);
+  var lastTimeout = null;
+
+  var debounce = function (cb, ms) {
+
+    if (lastTimeout) {
+      clearTimeout(lastTimeout);
     }
-    window.lastTimeout = setTimeout(function () {
+    lastTimeout = setTimeout(function () {
       cb();
     }, ms);
   };
+
+  window.debounce = debounce;
 })();
